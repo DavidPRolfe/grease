@@ -107,12 +107,17 @@ class Command(object):
             except BaseException:
                 self.exec_data['execVal'] = False
                 exc_type, exc_obj, exc_tb = sys.exc_info()
+                # Find initial traceback frame
+                current_tb = exc_tb
+                while current_tb.tb_next:
+                    current_tb = current_tb.tb_next
+
                 self.ioc.getLogger().error(
                     "Failed to execute [{0}] execute got exception!".format(self.__class__.__name__),
                     additional={
-                        'file': os.path.split(exc_tb.tb_frame.f_code.co_filename)[1],
+                        'file': os.path.split(current_tb.tb_frame.f_code.co_filename)[1],
                         'type': exc_type,
-                        'line': exc_tb.tb_lineno
+                        'line': current_tb.tb_lineno
                     }
                 )
             except:
